@@ -8,7 +8,7 @@ const PORT = 3001;
 
 app.use(bodyParser.json());
 
-mongoose.connect("mongodb://root:example@mongo:27017/")
+mongoose.connect("mongodb://root:example@mongo-cart:27017")
 .then(() => console.log('[CART-SERVICE] Connexion à MongoDB réussie'))
   .catch(err => console.error('[CART-SERVICE] Erreur de connexion à MongoDB:', err));
 

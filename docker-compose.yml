@@ -1,20 +1,57 @@
-version: '3.1'
-
 services:
+  api-gateway:
+    build: .
+    ports:
+      - "3000:3000"
+
   cart-service:
     build: ./carts-service/.
     ports:
       - "3001:3001"
-  mongo:
+    depends_on:
+      - mongo-cart
+
+  user-service:
+    build: ./users-service/.
+    ports:
+      - "3002:3002"
+    depends_on:
+      - mongo-user
+
+  mongo-cart:
     image: mongo
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - cartdb-data:/data/db
     ports:
-      - 27017:27017
+      - 27018:27017
 
-  mongo-express:
+  mongo-user:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - userdb-data:/data/db
+    ports:
+      - 27019:27017
+
+  mongo-express-cart:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8082:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo-cart:27017/
+      ME_CONFIG_BASICAUTH: false
+  
+  mongo-express-user:
     image: mongo-express
     restart: always
     ports:
@@ -22,5 +59,9 @@ services:
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: root
       ME_CONFIG_MONGODB_ADMINPASSWORD: example
-      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo-user:27017/
       ME_CONFIG_BASICAUTH: false
+
+volumes:
+  cartdb-data:
+  userdb-data:
