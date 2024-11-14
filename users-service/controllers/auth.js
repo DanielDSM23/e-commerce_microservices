@@ -43,6 +43,7 @@ module.exports = {
             res.status(401).send({
                 message: 'User not exist'
             });
+            return;
         }
 
         const checkPassword = await bcrypt.compare(password, user.password);
