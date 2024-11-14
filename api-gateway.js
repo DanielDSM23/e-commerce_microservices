@@ -34,7 +34,7 @@ app.use((req, res, next) => {
 app.use('/auth', createProxyMiddleware({
   target: process.env.USER_SERVICE_URL,
   pathRewrite: {
-    '': '/api/auth/',
+    '': '/api/auth',
   },
 }));
 
