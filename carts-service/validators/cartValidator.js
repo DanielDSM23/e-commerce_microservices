@@ -1,9 +1,6 @@
 const { body, param, validationResult } = require('express-validator');
 
 exports.validateAddToCart = [
-    body('userId')
-        .notEmpty().withMessage('userId est requis')
-        .isMongoId().withMessage('userId doit être un identifiant valide'),
     body('productId')
         .notEmpty().withMessage('productId est requis')
         .isMongoId().withMessage('productId doit être un identifiant valide'),
@@ -37,9 +34,6 @@ exports.validateGetCart = [
 ];
 
 exports.validateRemoveFromCart = [
-    body('userId')
-        .notEmpty().withMessage('userId est requis')
-        .isMongoId().withMessage('userId doit être un identifiant valide'),
     body('productId')
         .notEmpty().withMessage('productId est requis')
         .isMongoId().withMessage('productId doit être un identifiant valide'),
@@ -55,9 +49,6 @@ exports.validateRemoveFromCart = [
 ];
 
 exports.validateUpdateCartItem = [
-    body('userId')
-        .notEmpty().withMessage('userId est requis')
-        .isMongoId().withMessage('userId doit être un identifiant valide'),
     body('productId')
         .notEmpty().withMessage('productId est requis')
         .isMongoId().withMessage('productId doit être un identifiant valide'),

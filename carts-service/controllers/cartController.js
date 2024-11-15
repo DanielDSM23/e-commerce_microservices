@@ -1,7 +1,8 @@
 const Cart = require('../models/Cart');
 
 exports.addToCart = async (req, res) => {
-    const { userId, productId, quantity } = req.body;
+    const { productId, quantity } = req.body;
+    const userId = req.headers['x-user-id'];
     console.log(`[ADD TO CART] Request received: userId=${userId}, productId=${productId}, quantity=${quantity}`);
 
     try {
@@ -55,7 +56,9 @@ exports.getCart = async (req, res) => {
 };
 
 exports.removeFromCart = async (req, res) => {
-    const { userId, productId } = req.body;
+    const {productId} = req.body;
+    const userId = req.headers['x-user-id'];
+    console.log('Reçu X-User-Id :', userId);
     console.log(`[REMOVE FROM CART] Request received: userId=${userId}, productId=${productId}`);
 
     try {
@@ -79,7 +82,8 @@ exports.removeFromCart = async (req, res) => {
 };
 
 exports.updateCartItem = async (req, res) => {
-    const { userId, productId, quantity } = req.body;
+    const { productId, quantity } = req.body;
+    const userId = req.headers['x-user-id'];
     console.log(`[UPDATE CART ITEM] Request received: userId=${userId}, productId=${productId}, quantity=${quantity}`);
 
     try {

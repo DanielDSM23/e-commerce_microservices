@@ -12,8 +12,6 @@ services:
 
   cart-service:
     build: ./carts-service/.
-    ports:
-      - "3001:3001"
     depends_on:
       - mongo-cart
     networks:

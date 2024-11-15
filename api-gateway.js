@@ -2,6 +2,8 @@ require('dotenv').config();
 const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const jwt = require('jsonwebtoken');
+const axios = require('axios');
+const cartRoutes = require('./routes/cartRoutes');
 
 const app = express();
 const PORT = process.env.PORT;
@@ -57,6 +59,9 @@ app.get('/test-jwt', verifyJWT, (req, res) => {
     user: req.user,
   });
 });
+
+app.use('/cart', verifyJWT, cartRoutes);
+
 
 
 app.listen(PORT, () => {
