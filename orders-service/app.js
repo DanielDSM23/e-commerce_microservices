@@ -46,7 +46,7 @@ mongoose
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocs));
 
 // Recuperation des definitions de routes
-app.use('/api/', apiRouter);
+app.use('/api/order', apiRouter);
 
 //Lance le server sur le port renseigné
 app.listen(port, () => {

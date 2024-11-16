@@ -1,12 +1,22 @@
 const OrderModel = require('../models/Order');
 const { verifyUser } = require('../validator/order');
+const axios = require('axios');
 
 module.exports = {
 
 
     createCommand: async (req, res) => {
         try {
-            //ajouter la route de cart pour supprimer par rapport au user.
+            const userId = req.headers['User-Id'];
+            const token = req.headers['token'];
+            const response = await axios.get(`${process.env.CART_SERVICE_URL}/cart/${userId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`  // Set the Bearer token in the Authorization header
+                }
+            });
+
+            const products = response.data;
+            res.send(products);
         } catch (error) {
             res.send({
                 message: error.message
@@ -17,19 +27,19 @@ module.exports = {
     readCommand: async (req, res) => {
         try {
             const { commandId } = req.params;
-            console.log(`[GET COMMAND] Request received: commandId=${commandId}`);
+            console.log(`[GET ORDER] Request received: commandId=${commandId}`);
 
             try {
                 const order = await OrderModel.find({ id: commandId }).populate('items.productId');
-                console.log(`[GET COMMAND] Cart found: ${order}`);
+                console.log(`[GET ORDER] Order found: ${order}`);
 
                 if (!order) {
                     res.status(404).json({ message: 'Commande non trouvé' });
                 } else {
-                    res.status(200).json(cart);
+                    res.status(200).json(order);
                 }
             } catch (error) {
-                console.error(`[GET COMMAND] Error: ${error}`);
+                console.error(`[GET ORDER] Error: ${error}`);
                 res.status(500).json({ message: 'Erreur lors de la récupération de la commande', error });
             }
         } catch (error) {
