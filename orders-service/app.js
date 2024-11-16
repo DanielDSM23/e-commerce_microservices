@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const port = process.env.PORT;
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUI = require('swagger-ui-express');
-const apiRouter = require('./routes');
+const apiRouter = require('./routes/order');
 const cors = require('cors');
 
 

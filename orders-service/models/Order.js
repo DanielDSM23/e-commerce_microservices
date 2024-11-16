@@ -31,4 +31,4 @@ const CommandSchema = new mongoose.Schema({
 });
 
 
-module.exports = mongoose.model('Cart', CartSchema);
+module.exports = mongoose.model('Order', CommandSchema);
