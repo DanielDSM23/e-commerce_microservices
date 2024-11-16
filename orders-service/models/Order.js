@@ -27,6 +27,17 @@ const CommandSchema = new mongoose.Schema({
     updatedAt: {
         type: Date,
         default: Date.now
+    },
+    price: {
+        type: Number,
+        required: true,
+        min: 0,
+        validate: {
+            validator: function(value) {
+                return !isNaN(value) && value > 0;
+            },
+            message: 'Price must be a positive number'
+        }
     }
 });
 

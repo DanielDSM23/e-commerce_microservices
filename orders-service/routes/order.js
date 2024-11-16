@@ -7,7 +7,7 @@ router.post('/add', orderValidator.validateCreateOrder, orderController.createCo
 
 router.get('/:orderId', orderValidator.validateGetOrder, orderController.readCommand);
 
-router.delete('/remove', orderValidator.validateRemoveOrder, orderController.deleteCommand);
+router.delete('/remove/:orderId', orderValidator.validateRemoveOrder, orderController.deleteCommand);
 
 router.put('/update', orderValidator.validateUpdateOrder, orderController.updateCommand);
 
