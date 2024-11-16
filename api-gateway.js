@@ -40,23 +40,30 @@ app.use('/auth', createProxyMiddleware({
   },
 }));
 
-/*app.use('/command', verifyJWT, createProxyMiddleware({
-  target: process.env.PROTECTED_SERVICE_URL,
+app.use('/order', verifyJWT, (req, res, next) => {
+  if (req.user && req.user.userId) {
+    req.headers['User-Id'] = req.user.userId;
+    req.headers['token'] = req.headers['authorization'].split(' ')[1];
+    console.log("[API-GATEWAY ORDER PROXY] Sending User-Id to order service:", req.user.userId);
+  } else {
+    console.error("[API-GATEWAY ORDER PROXY] User ID not found in req.user");
+  }
+  next();
+}, createProxyMiddleware({
+  target: process.env.ORDER_SERVICE_URL,
   changeOrigin: true,
   pathRewrite: {
-    '^/': '',
+    '': '/api/order',
   },
-  onProxyReq: (proxyReq, req) => {
-    if (req.user) {
-      proxyReq.setHeader('X-User-Id', req.user.id);
-      proxyReq.setHeader('X-User-Role', req.user.role);
-    }
-  },
-}));*/
+}));
+
+
+
+
 app.get('/test-jwt', verifyJWT, (req, res) => {
   res.json({
     message: 'Le JWT est valide',
-    user: req.user,
+    user: req.user.userId,
   });
 });
 
