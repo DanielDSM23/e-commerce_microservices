@@ -9,6 +9,6 @@ router.get('/:orderId', orderValidator.validateGetOrder, orderController.readCom
 
 router.delete('/remove/:orderId', orderValidator.validateRemoveOrder, orderController.deleteCommand);
 
-router.put('/update', orderValidator.validateUpdateOrder, orderController.updateCommand);
+router.put('/update/:orderId', orderValidator.validateUpdateOrder, orderController.updateCommand);
 
 module.exports = router;

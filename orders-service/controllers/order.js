@@ -53,11 +53,11 @@ module.exports = {
 
     readCommand: async (req, res) => {
         try {
-            const { commandId } = req.params;
-            console.log(`[GET ORDER] Request received: commandId=${commandId}`);
+            const { orderId } = req.params;
+            console.log(`[GET ORDER] Request received: commandId=${orderId}`);
 
             try {
-                const order = await OrderModel.findById(commandId).populate('items.productId');
+                const order = await OrderModel.findById(orderId).populate('items.productId');
                 console.log(`[GET ORDER] Order found: ${order}`);
 
                 if (!order) {
@@ -78,10 +78,52 @@ module.exports = {
 
 
     updateCommand: async (req, res) => {
+        const { orderId } = req.params;
+        const { items } = req.body;
+
+        if (!items || !Array.isArray(items)) {
+            return res.status(400).json({ message: "Invalid 'items' provided" });
+        }
+
         try {
 
-        } catch (error){
+            const order = await OrderModel.findById(orderId);
+            if (!order) {
+                return res.status(404).json({ message: 'Order not found' });
+            }
 
+
+            const currentPrice = order.price;
+
+
+            const newPrice = items.reduce((total, item) => {
+                if (!item.productId || !item.quantity || !item.price) {
+                    throw new Error('Each item must have productId, quantity, and price');
+                }
+                return total + item.quantity * item.price;
+            }, 0);
+
+
+            const refundAmount = currentPrice - newPrice;
+
+
+            order.items = items;
+            order.price = newPrice;
+            order.updatedAt = new Date();
+
+
+            const updatedOrder = await order.save();
+
+
+            res.status(200).json({
+                message: 'Order updated successfully',
+                refundAmount: refundAmount > 0 ? refundAmount : 0, // Positive refund only
+                additionalCharge: refundAmount < 0 ? Math.abs(refundAmount) : 0, // Positive charge if newPrice > currentPrice
+                updatedOrder
+            });
+        } catch (error) {
+            console.error('Error updating order:', error.message);
+            res.status(500).json({ message: 'Internal server error', error: error.message });
         }
 
 

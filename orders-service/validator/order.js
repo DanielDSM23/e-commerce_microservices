@@ -31,38 +31,38 @@ exports.validateGetOrder = [
 ];
 
 exports.validateUpdateOrder = [
-    param('orderId')
-        .notEmpty().withMessage('orderId est requis')
-        .isMongoId().withMessage('orderId doit être un identifiant valide'),
-    body('products')
+    body('items')
         .isArray({ min: 1 }).withMessage('La commande doit contenir au moins un produit')
-        .custom(products => {
-            return products.every(product =>
-                product.productId &&
-                typeof product.productId === 'string' &&
-                product.quantity &&
-                Number.isInteger(product.quantity) &&
-                product.quantity > 0 &&
-                product.price &&
-                !isNaN(parseFloat(product.price))
+        .custom(items => {
+            return items.every(item =>
+                item.productId &&
+                typeof item.productId === 'string' &&
+                item.quantity &&
+                Number.isInteger(item.quantity) && item.quantity > 0 &&
+                item.price &&
+                !isNaN(parseFloat(item.price)) && item.price > 0
             );
         }).withMessage('Chaque produit doit avoir un productId valide, une quantité positive et un prix valide'),
-    body('products.*.productId')
+
+    body('items.*.productId')
         .notEmpty().withMessage('Chaque produit doit avoir un productId')
         .isMongoId().withMessage('productId doit être un identifiant valide'),
-    body('products.*.quantity')
+
+    body('items.*.quantity')
         .notEmpty().withMessage('Chaque produit doit avoir une quantité')
         .isInt({ min: 1 }).withMessage('La quantité doit être un entier positif'),
-    body('products.*.price')
+
+    body('items.*.price')
         .notEmpty().withMessage('Chaque produit doit avoir un prix')
         .isFloat({ gt: 0 }).withMessage('Le prix doit être un nombre positif'),
+
     (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            console.error(`[VALIDATE UPDATE ORDER] Validation errors: ${JSON.stringify(errors.array())}`);
+            console.error(`[VALIDATE ITEMS] Erreurs de validation: ${JSON.stringify(errors.array())}`);
             return res.status(400).json({ errors: errors.array() });
         }
-        console.log(`[VALIDATE UPDATE ORDER] Validation passed: orderId=${req.params.orderId}, products=${JSON.stringify(req.body.products)}`);
+        console.log(`[VALIDATE ITEMS] Validation réussie: items=${JSON.stringify(req.body.items)}`);
         next();
     }
 ];
