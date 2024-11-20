@@ -7,16 +7,39 @@ module.exports = {
 
     createCommand: async (req, res) => {
         try {
-            const userId = req.headers['User-Id'];
+            console.log(' ORDER SERVICE Headers sent to downstream service:', req.headers);
+
+            const userId = req.headers['user-id'];
+            console.log("USER ID =  ", userId)
             const token = req.headers['token'];
-            const response = await axios.get(`${process.env.CART_SERVICE_URL}/cart/${userId}`, {
+            const response = await axios.get(`${process.env.CART_SERVICE_URL}/cart`, {
                 headers: {
-                    'Authorization': `Bearer ${token}`  // Set the Bearer token in the Authorization header
+                    'Authorization': `Bearer ${token}`
                 }
             });
 
-            const products = response.data;
-            res.send(products);
+            let items = [];
+            let totalPrice = 0;
+            for(let i = 0; i<response.data.items.length; i++){
+                items.push({
+                    productId : response.data.items[i].productId,
+                    quantity : response.data.items[i].quantity,
+                })
+                totalPrice+= +response.data.items[i].quantity * +response.data.items[i].productDetails.price
+            }
+
+            const orderData = {
+                userId: userId,
+                items: items,
+                price: totalPrice,
+                createdAt: new Date(),
+                updatedAt: new Date()
+            };
+            console.log(orderData);
+            const order = new OrderModel(orderData);
+            const savedOrder = await order.save();
+            res.status(201).json({ message: 'Order created successfully', order: savedOrder });
+
         } catch (error) {
             res.send({
                 message: error.message
