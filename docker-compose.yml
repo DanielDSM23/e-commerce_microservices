@@ -29,6 +29,12 @@ services:
       - mongo-order
     networks:
       - api_network
+  product-service:
+    build: ./products-service/.
+    depends_on:
+      - mongo-product
+    networks:
+      - api_network
 
   mongo-cart:
     image: mongo
