@@ -1,0 +1,148 @@
+networks:
+  api_network:
+    driver: bridge
+
+services:
+  api-gateway:
+    build: .
+    ports:
+      - "3000:3000"
+    networks:
+      - api_network
+
+  cart-service:
+    build: ./carts-service/.
+    depends_on:
+      - mongo-cart
+    networks:
+      - api_network
+
+  user-service:
+    build: ./users-service/.
+    depends_on:
+      - mongo-user
+    networks:
+      - api_network
+  order-service:
+    build: ./orders-service/.
+    depends_on:
+      - mongo-order
+    networks:
+      - api_network
+  
+  product-service:
+    build: ./products-service/.
+    depends_on:
+      - mongo-product
+    networks:
+      - api_network
+
+  mongo-cart:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - cartdb-data:/data/db
+    ports:
+      - 27018:27017
+    networks:
+      - api_network
+
+  mongo-user:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - userdb-data:/data/db
+    ports:
+      - 27019:27017
+    networks:
+      - api_network
+  
+  mongo-product:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - productdb-data:/data/db
+    ports:
+      - 27020:27017
+    networks:
+      - api_network
+
+  mongo-order:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - orderdb-data:/data/db
+    ports:
+      - 27021:27017
+    networks:
+      - api_network
+
+
+  mongo-express-cart:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8082:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo-cart:27017/
+      ME_CONFIG_BASICAUTH: false
+    networks:
+      - api_network
+  
+  mongo-express-user:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo-user:27017/
+      ME_CONFIG_BASICAUTH: false
+    networks:
+      - api_network
+  
+  mongo-express-product:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8083:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo-product:27017/
+      ME_CONFIG_BASICAUTH: false
+    networks:
+      - api_network
+
+  mongo-express-order:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8084:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo-order:27017/
+      ME_CONFIG_BASICAUTH: false
+    networks:
+      - api_network
+volumes:
+  cartdb-data:
+  userdb-data:
+  productdb-data:
+  orderdb-data:

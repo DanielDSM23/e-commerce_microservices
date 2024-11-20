@@ -1,0 +1,1 @@
+pour lancer le projet avec docker : docker-compose up --build / ocker-compose up --build --force-recreate
