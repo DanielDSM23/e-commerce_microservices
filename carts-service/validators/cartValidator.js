@@ -1,4 +1,6 @@
 const { body, param, validationResult } = require('express-validator');
+const pino = require('pino');
+const logger = pino({ level: 'info' });
 
 exports.validateAddToCart = [
     body('productId')
@@ -10,10 +12,10 @@ exports.validateAddToCart = [
     (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            console.error(`[VALIDATE ADD TO CART] Validation errors: ${JSON.stringify(errors.array())}`);
+            logger.error(`[VALIDATE ADD TO CART] Validation errors: ${JSON.stringify(errors.array())}`);
             return res.status(400).json({ errors: errors.array() });
         }
-        console.log(`[VALIDATE ADD TO CART] Validation passed: userId=${req.body.userId}, productId=${req.body.productId}, quantity=${req.body.quantity}`);
+        logger.info(`[VALIDATE ADD TO CART] Validation passed: userId=${req.body.userId}, productId=${req.body.productId}, quantity=${req.body.quantity}`);
         next();
     }
 ];
@@ -25,10 +27,10 @@ exports.validateGetCart = [
     (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            console.error(`[VALIDATE GET CART] Validation errors: ${JSON.stringify(errors.array())}`);
+            logger.error(`[VALIDATE GET CART] Validation errors: ${JSON.stringify(errors.array())}`);
             return res.status(400).json({ errors: errors.array() });
         }
-        console.log(`[VALIDATE GET CART] Validation passed: userId=${req.params.userId}`);
+        logger.info(`[VALIDATE GET CART] Validation passed: userId=${req.params.userId}`);
         next();
     }
 ];
@@ -40,10 +42,10 @@ exports.validateRemoveFromCart = [
     (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            console.error(`[VALIDATE REMOVE FROM CART] Validation errors: ${JSON.stringify(errors.array())}`);
+            logger.error(`[VALIDATE REMOVE FROM CART] Validation errors: ${JSON.stringify(errors.array())}`);
             return res.status(400).json({ errors: errors.array() });
         }
-        console.log(`[VALIDATE REMOVE FROM CART] Validation passed: userId=${req.body.userId}, productId=${req.body.productId}`);
+        logger.info(`[VALIDATE REMOVE FROM CART] Validation passed: userId=${req.body.userId}, productId=${req.body.productId}`);
         next();
     }
 ];
@@ -58,10 +60,10 @@ exports.validateUpdateCartItem = [
     (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            console.error(`[VALIDATE UPDATE CART ITEM] Validation errors: ${JSON.stringify(errors.array())}`);
+            logger.error(`[VALIDATE UPDATE CART ITEM] Validation errors: ${JSON.stringify(errors.array())}`);
             return res.status(400).json({ errors: errors.array() });
         }
-        console.log(`[VALIDATE UPDATE CART ITEM] Validation passed: userId=${req.body.userId}, productId=${req.body.productId}, quantity=${req.body.quantity}`);
+        logger.info(`[VALIDATE UPDATE CART ITEM] Validation passed: userId=${req.body.userId}, productId=${req.body.productId}, quantity=${req.body.quantity}`);
         next();
     }
 ];
