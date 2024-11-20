@@ -21,6 +21,7 @@ module.exports = {
                 items.push({
                     productId : response.data.items[i].productId,
                     quantity : response.data.items[i].quantity,
+                    price: response.data.items[i].productDetails.price,
                 })
                 totalPrice+= +response.data.items[i].quantity * +response.data.items[i].productDetails.price
             }
@@ -56,7 +57,7 @@ module.exports = {
             console.log(`[GET ORDER] Request received: commandId=${commandId}`);
 
             try {
-                const order = await OrderModel.find({ id: commandId }).populate('items.productId');
+                const order = await OrderModel.findById(commandId).populate('items.productId');
                 console.log(`[GET ORDER] Order found: ${order}`);
 
                 if (!order) {
