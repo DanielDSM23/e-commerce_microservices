@@ -7,10 +7,7 @@ module.exports = {
 
     createCommand: async (req, res) => {
         try {
-            console.log(' ORDER SERVICE Headers sent to downstream service:', req.headers);
-
             const userId = req.headers['user-id'];
-            console.log("USER ID =  ", userId)
             const token = req.headers['token'];
             const response = await axios.get(`${process.env.CART_SERVICE_URL}/cart`, {
                 headers: {
@@ -38,9 +35,15 @@ module.exports = {
             console.log(orderData);
             const order = new OrderModel(orderData);
             const savedOrder = await order.save();
+            console.error(
+                '[ORDER SERVICE] Order created'
+            );
             res.status(201).json({ message: 'Order created successfully', order: savedOrder });
 
         } catch (error) {
+            console.error(
+                '[ORDER SERVICE] Error ', error.message
+            );
             res.send({
                 message: error.message
             });

@@ -47,7 +47,6 @@ app.use(
     '/order',
     verifyJWT,
     (req, res, next) => {
-      console.log('[DEBUG] req.user in middleware:', req.user);
       if (req.user && req.user.userId) {
         req.headers['user-id'] = req.user.userId;
         req.headers['token'] = req.headers['authorization'].split(' ')[1];
