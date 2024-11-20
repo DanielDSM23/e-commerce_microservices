@@ -2,14 +2,13 @@ require('dotenv').config();
 const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const jwt = require('jsonwebtoken');
-const axios = require('axios');
 const cartRoutes = require('./routes/cartRoutes');
 
 const app = express();
 const PORT = process.env.PORT;
 const SECRET_KEY = process.env.SECRET_KEY || 'secret';
 
-
+// Middleware pour vérifier le JWT
 const verifyJWT = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   if (authHeader) {
@@ -26,62 +25,80 @@ const verifyJWT = (req, res, next) => {
   }
 };
 
-
-
+// Middleware de journalisation
 app.use((req, res, next) => {
   console.log(`Requête reçue : ${req.method} ${req.url}`);
   next();
 });
 
-app.use('/auth', createProxyMiddleware({
-  target: process.env.USER_SERVICE_URL,
-  pathRewrite: {
-    '': '/api/auth',
-  },
-}));
-
-app.use('/order', verifyJWT, (req, res, next) => {
-  if (req.user && req.user.userId) {
-    req.headers['User-Id'] = req.user.userId;
-    req.headers['token'] = req.headers['authorization'].split(' ')[1];
-    console.log("[API-GATEWAY ORDER PROXY] Sending User-Id to order service:", req.user.userId);
-  } else {
-    console.error("[API-GATEWAY ORDER PROXY] User ID not found in req.user");
-  }
-  next();
-}, createProxyMiddleware({
-  target: process.env.ORDER_SERVICE_URL,
-  changeOrigin: true,
-  pathRewrite: {
-    '': '/api/order',
-  },
-}));
-
-const productRoutesProxy = createProxyMiddleware({
-  target: process.env.PRODUCT_SERVICE_URL || 'http://localhost:3004',
-  changeOrigin: true,
-  pathRewrite: {
-    '': '/products', // Vérifiez que cette réécriture est correcte
-  },
-});
-
+// Route pour le service d'authentification
 app.use(
-  '/products',
-  verifyJWT, // Middleware pour valider le JWT
+  '/auth',
+  createProxyMiddleware({
+    target: process.env.USER_SERVICE_URL,
+    pathRewrite: {
+      '': '/api/auth',
+    },
+  })
+);
+
+// Route pour le service de commande
+app.use(
+  '/order',
+  verifyJWT,
   (req, res, next) => {
     if (req.user && req.user.userId) {
       req.headers['User-Id'] = req.user.userId;
-      req.headers['Token'] = req.headers['authorization'].split(' ')[1];
-      console.log(`[API-GATEWAY PRODUCT PROXY] User-Id envoyé : ${req.user.userId}`);
+      req.headers['token'] = req.headers['authorization'].split(' ')[1];
+      console.log(
+        '[API-GATEWAY ORDER PROXY] Sending User-Id to order service:',
+        req.user.userId
+      );
     } else {
-      console.error('[API-GATEWAY PRODUCT PROXY] Aucun User-Id trouvé dans req.user');
+      console.error(
+        '[API-GATEWAY ORDER PROXY] User ID not found in req.user'
+      );
     }
     next();
   },
-  productRoutesProxy
+  createProxyMiddleware({
+    target: process.env.ORDER_SERVICE_URL,
+    changeOrigin: true,
+    pathRewrite: {
+      '': '/api/order',
+    },
+  })
 );
 
+// Route pour le service produit
+app.use(
+  '/products',
+  verifyJWT,
+  (req, res, next) => {
+    if (req.user && req.user.userId) {
+      req.headers['User-Id'] = req.user.userId;
+      req.headers['token'] = req.headers['authorization'].split(' ')[1];
+      console.log(
+        '[API-GATEWAY PRODUCT PROXY] Sending User-Id to product service:',
+        req.user.userId
+      );
+    } else {
+      console.error(
+        '[API-GATEWAY PRODUCT PROXY] User ID not found in req.user'
+      );
+    }
+    next();
+  },
+  createProxyMiddleware({
+    target: process.env.PRODUCT_SERVICE_URL,
+    changeOrigin: true,
+    pathRewrite: {
+      '^/products': '', // Réécrit l'URL pour qu'elle corresponde à celle du service produit
+    },
+  })
+);
 
+// Route pour tester le JWT
 app.get('/test-jwt', verifyJWT, (req, res) => {
   res.json({
     message: 'Le JWT est valide',
@@ -89,10 +106,10 @@ app.get('/test-jwt', verifyJWT, (req, res) => {
   });
 });
 
+// Route pour le panier
 app.use('/cart', verifyJWT, cartRoutes);
 
-
-
+// Démarrage du serveur
 app.listen(PORT, () => {
   console.log(`server is running on http://localhost:${PORT}`);
 });
