@@ -23,7 +23,7 @@ Ce projet implémente une architecture microservices pour une plateforme e-comme
 
 Clonez le dépôt :
 ```sh
-git clone https://github.com/votre-repo/microservices-ecommerce.git 
+git clone https://github.com/DanielDSM23/e-commerce_microservices.git 
 ```
 
 Démarrer l'application avec docker
