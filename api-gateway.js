@@ -93,7 +93,7 @@ app.use(
     target: process.env.PRODUCT_SERVICE_URL,
     changeOrigin: true,
     pathRewrite: {
-      '^/products': '', // Réécrit l'URL pour qu'elle corresponde à celle du service produit
+      '': '/products', // Réécrit l'URL pour qu'elle corresponde à celle du service produit
     },
   })
 );
