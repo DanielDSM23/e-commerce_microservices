@@ -1,5 +1,8 @@
 const express = require('express');
-const axios = require('axios');
+let axios = require('axios');
+axios = axios.create({
+  timeout: 2000
+})
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const app = express();

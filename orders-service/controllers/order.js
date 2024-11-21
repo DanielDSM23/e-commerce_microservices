@@ -1,6 +1,9 @@
 const OrderModel = require('../models/Order');
 const { verifyUser } = require('../validator/order');
-const axios = require('axios');
+let axios = require('axios');
+axios = axios.create({
+    timeout: 2000
+});
 const pino = require('pino');
 const logger = pino({ level: 'info' });
 
