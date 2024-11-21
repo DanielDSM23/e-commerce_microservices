@@ -2,7 +2,7 @@ const OrderModel = require('../models/Order');
 const { verifyUser } = require('../validator/order');
 let axios = require('axios');
 axios = axios.create({
-    timeout: 2000
+    timeout: 5000
 });
 const pino = require('pino');
 const logger = pino({ level: 'info' });
@@ -16,7 +16,7 @@ module.exports = {
 
             logger.info('[ORDER SERVICE] Request to create order received.');
 
-            const response = await axios.get(`${process.env.CART_SERVICE_URL}/cart`, {
+            const response = await axios.get(`${process.env.API_GATEWAY}/cart`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -31,6 +31,17 @@ module.exports = {
                     price: response.data.items[i].productDetails.price,
                 });
                 totalPrice += +response.data.items[i].quantity * +response.data.items[i].productDetails.price;
+                const stock = response.data.items[i].productDetails.stock;
+                if(stock - response.data.items[i].quantity <= 0){
+                    res.status(401).send({message : "No stock available"});
+                    return;
+                }
+                const productResponse = await axios.put(process.env.API_GATEWAY+'/products/'+response.data.items[i].productId, { stock : stock - response.data.items[i].quantity}, { headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer '+token}, maxBodyLength: Infinity })
+                if(productResponse.status !== 200){
+                    res.status(401).send({message : "An error has occurred"});
+                    return;
+                }
+
             }
 
             const orderData = {

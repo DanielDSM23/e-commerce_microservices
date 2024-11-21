@@ -22,7 +22,7 @@ router.post('/', async (req, res) => {
 // Récupérer tous les produits
 router.get('/', async (req, res) => {
   try {
-    const products = await Product.find();
+    const products = Product.find({ stock: { $ne: 0 } });
     res.json(products);
   } catch (error) {
     res.status(500).json({ message: error.message });
