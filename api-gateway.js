@@ -134,7 +134,7 @@ app.use(
     target: process.env.DELIVERY_SERVICE_URL,
     changeOrigin: true,
     pathRewrite: {
-      '': '/api/delivery', // Réécriture pour correspondre aux routes du service de livraison
+      '': '/api/deliveries',
     },
   })
 );
