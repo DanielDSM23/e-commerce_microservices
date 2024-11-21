@@ -110,6 +110,36 @@ app.get('/test-jwt', verifyJWT, (req, res) => {
 // Route pour le panier
 app.use('/cart', verifyJWT, cartRoutes);
 
+
+// Route pour le service de livraison
+app.use(
+  '/delivery',
+  verifyJWT,
+  (req, res, next) => {
+    if (req.user && req.user.userId) {
+      req.headers['user-id'] = req.user.userId;
+      req.headers['token'] = req.headers['authorization'].split(' ')[1];
+      console.log(
+        '[API-GATEWAY DELIVERY PROXY] Sending User-Id to delivery service:',
+        req.user.userId
+      );
+    } else {
+      console.error(
+        '[API-GATEWAY DELIVERY PROXY] User ID not found in req.user'
+      );
+    }
+    next();
+  },
+  createProxyMiddleware({
+    target: process.env.DELIVERY_SERVICE_URL,
+    changeOrigin: true,
+    pathRewrite: {
+      '': '/api/delivery', // Réécriture pour correspondre aux routes du service de livraison
+    },
+  })
+);
+
+
 // Démarrage du serveur
 app.listen(PORT, () => {
   console.log(`server is running on http://localhost:${PORT}`);
