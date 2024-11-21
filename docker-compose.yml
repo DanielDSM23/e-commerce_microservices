@@ -36,7 +36,7 @@ services:
     networks:
       - api_network
   delivery-service:
-    build: ./delivery-service/.
+    build: ./deliveries-service/.
     depends_on:
       - mongo-delivery
     networks:
